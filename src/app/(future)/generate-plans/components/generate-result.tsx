@@ -1,11 +1,13 @@
+import { LearningPlanPdf } from "@/components/LearningPlanPdf";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface GenerateResultProps {
+export interface GenerateResultProps {
     data: {
         learningPlan: {
             numberOfDay: number;
@@ -33,7 +35,6 @@ interface GenerateResultProps {
                     },
                 }>;
             }
-            createdAt: string;
         }
     }
 }
@@ -75,6 +76,17 @@ export const GenerateResult = (
                         <CardDescription>
                             Rencana belajar {learningPlan.numberOfDay} hari yang dipersonalisasi
                         </CardDescription>
+                        <PDFDownloadLink
+                            document={<LearningPlanPdf learningPlan={learningPlan} />}
+                            fileName={`rencana-pembelajaran-${new Date()
+                                .toISOString()
+                                .replace(/[:.]/g, '-')
+                                .slice(0, 16)}.pdf`}
+                        >
+                            {({ loading }) =>
+                                <Button>{loading ? 'Menyiapkan...' : 'Download PDF'}</Button>
+                            }
+                        </PDFDownloadLink>
                         <Button onClick={onSubmit} disabled={loading}>
                             {loading ? "Menyimpan..." : "Simpan Rencana"}
                         </Button>

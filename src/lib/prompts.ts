@@ -37,7 +37,7 @@ export function generatePrompt(age: number, gender: string, hobbies: string, goa
         Setiap akhir kegiatan harian bisa ditutup dengan Hamdalah dan doa penutup majelis atau doa relevan lainnya.
         Jika memungkinkan, berikan ide untuk gambar atau visual sederhana yang bisa mendukung worksheet atau materi.
 
-        Struktur JSON yang diharapkan adalah sebagai berikut. Anda HARUS mengisi konten ke dalam struktur ini (tidak ada teks lain, tidak ada format markdown):
+        Struktur JSON yang diharapkan adalah sebagai berikut. Anda HARUS mengisi konten ke dalam struktur ini (tidak ada teks lain, tidak ada format markdown, tidak boleh ada bold seta italic):
         {
             "days": [
                 {
