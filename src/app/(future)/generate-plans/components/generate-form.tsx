@@ -30,7 +30,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { generatePrompt } from "@/lib/prompts"
-import { ChildProfile } from "@/generated/prisma"
+import { ChildProfile} from "@/generated/prisma"
 import { cleanAndParseResponse } from "@/lib/parseReturnPrompts"
 
 interface GenerateFormProps {
@@ -47,7 +47,7 @@ const formSchema = z.object({
 
 type GenerateFormValues = z.infer<typeof formSchema>
 
-export const GenerateForm = ({ initialData, onDataGenerated}: GenerateFormProps) => {
+export const GenerateForm = ({ initialData, onDataGenerated }: GenerateFormProps) => {
 
     const [loading, setLoading] = useState(false)
 
@@ -64,7 +64,7 @@ export const GenerateForm = ({ initialData, onDataGenerated}: GenerateFormProps)
         try {
             setLoading(true)
             const prompt = generatePrompt(initialData.age, initialData.gender, initialData.hobbies, data.goal, data.interest, String(data.numberOfDay));
-            const response = await fetch("/api/generate", {
+            const response = await fetch("/api/gemini-api", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -85,10 +85,9 @@ export const GenerateForm = ({ initialData, onDataGenerated}: GenerateFormProps)
             const formattedData = {
                 learningPlan: {
                     numberOfDay: data.numberOfDay,
-                    goal: data.goal, 
+                    goal: data.goal,
                     interest: data.interest,
-                    plan: { days: parsedPlan },
-                    createdAt: new Date().toISOString()
+                    plan: { days: parsedPlan }
                 }
             };
 
@@ -104,7 +103,7 @@ export const GenerateForm = ({ initialData, onDataGenerated}: GenerateFormProps)
 
     return (
         <Card className="w-full">
-            <CardHeader>
+            <CardHeader className="flex justify-between items-center">
                 <CardTitle>Create Learning Plan</CardTitle>
             </CardHeader>
             <CardContent>

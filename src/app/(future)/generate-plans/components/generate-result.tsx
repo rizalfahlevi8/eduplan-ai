@@ -1,4 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface GenerateResultProps {
     data: {
@@ -31,6 +36,67 @@ interface GenerateResultProps {
             createdAt: string;
         }
     }
+}
+
+export const GenerateResult = (
+    { data }: GenerateResultProps
+) => {
+    const { learningPlan } = data;
+    const { plan } = learningPlan;
+
+    const router = useRouter()
+    const [loading, setLoading] = useState(false)
+
+    const onSubmit = async () => {
+        try {
+            setLoading(true)
+            await axios.post(`/api/learning-plan`, {
+                goal: learningPlan.goal,
+                interests: learningPlan.interest,
+                numberOfDays: learningPlan.numberOfDay,
+                planJson: learningPlan.plan
+            })
+            router.refresh()
+            toast.success(`Rencana pembelajaran Anda berhasil disimpan`)
+        } catch (error) {
+            console.error(error)
+            toast.error("Terjadi kesalahan saat menyimpan rencana pembelajaran. Silakan coba lagi.")
+        } finally {
+            setLoading(false)
+        }
+    };
+
+    return (
+        <div className="space-y-8">
+            <Card className="w-full">
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle>Rencana Pembelajaran Anda</CardTitle>
+                        <CardDescription>
+                            Rencana belajar {learningPlan.numberOfDay} hari yang dipersonalisasi
+                        </CardDescription>
+                        <Button onClick={onSubmit} disabled={loading}>
+                            {loading ? "Menyimpan..." : "Simpan Rencana"}
+                        </Button>
+                    </div>
+                    <div className="mt-4">
+                        <div className="text-sm font-semibold mb-2">Ketertarikan:</div>
+                        <div className="text-lg">{learningPlan.interest}</div>
+                    </div>
+                    <div className="mt-4">
+                        <div className="text-sm font-semibold mb-2">Tujuan:</div>
+                        <div className="text-lg">{learningPlan.goal}</div>
+                    </div>
+                </CardHeader>
+            </Card>
+
+            <div className="space-y-6">
+                {plan.days.map((day) => (
+                    <DayCard key={day.dayNumber} day={day} />
+                ))}
+            </div>
+        </div>
+    );
 }
 
 const DayCard = ({ day }: { day: GenerateResultProps['data']['learningPlan']['plan']['days'][0] }) => (
@@ -117,39 +183,3 @@ const DayCard = ({ day }: { day: GenerateResultProps['data']['learningPlan']['pl
         </CardHeader>
     </Card>
 );
-
-export const GenerateResult = (
-    { data }: GenerateResultProps
-) => {
-    const { learningPlan } = data;
-    const { plan } = learningPlan;
-
-    return (
-        <div className="space-y-8">
-            <Card className="w-full">
-                <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <CardTitle>Rencana Pembelajaran Anda</CardTitle>
-                        <CardDescription>
-                            Rencana belajar {learningPlan.numberOfDay} hari yang dipersonalisasi
-                        </CardDescription>
-                    </div>
-                    <div className="mt-4">
-                        <div className="text-sm font-semibold mb-2">Ketertarikan:</div>
-                        <div className="text-lg">{learningPlan.interest}</div>
-                    </div>
-                    <div className="mt-4">
-                        <div className="text-sm font-semibold mb-2">Tujuan:</div>
-                        <div className="text-lg">{learningPlan.goal}</div>
-                    </div>
-                </CardHeader>
-            </Card>
-
-            <div className="space-y-6">
-                {plan.days.map((day) => (
-                    <DayCard key={day.dayNumber} day={day} />
-                ))}
-            </div>
-        </div>
-    );
-}

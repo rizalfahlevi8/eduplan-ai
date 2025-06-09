@@ -4,7 +4,7 @@ export function cleanAndParseResponse(result: string, numberOfDays: number) {
         .replace(/\s*```$/, '')
         .trim();
 
-    // console.log('Cleaned JSON string:', cleanJsonString);
+    console.log('Cleaned JSON string:', cleanJsonString);
 
     const parsed = JSON.parse(cleanJsonString);
 

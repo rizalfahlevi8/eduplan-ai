@@ -20,9 +20,22 @@ enum Gender {
 }
 
 model ChildProfile {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   age       Int
   gender    Gender
   hobbies   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model LearningPlan {
+  id           String    @id @default(cuid())
+  userId       String
+  goal         String
+  interests    String
+  numberOfDays Int
+  planJson     Json
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
 }

@@ -1,3 +1,4 @@
+
 import db from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -7,7 +8,7 @@ export default async function GeneratePlansLayout({
 }: {
     children: React.ReactNode;
 }) {
-    
+
     const { userId } = await auth()
     if (!userId) {
         redirect('/sign-in')
@@ -20,12 +21,13 @@ export default async function GeneratePlansLayout({
     })
 
     if (!childProfile) {
-        redirect('/') 
+        redirect('/settings')
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center min-h-screen">
             {children}
         </div>
     );
+
 }

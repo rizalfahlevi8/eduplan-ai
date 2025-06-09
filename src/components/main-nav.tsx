@@ -26,7 +26,7 @@ export function MainNav({ className }: MainNavProps) {
     {
       href: "/generate-plans",
       label: "Generate Plans",
-      active: pathname === "/generate-plans",
+      active: pathname === "/generate-plans" || pathname.startsWith(`/generate-plans/`),
       position: "left",
     },
   ];

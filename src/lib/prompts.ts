@@ -9,7 +9,7 @@ export function generatePrompt(age: number, gender: string, hobbies: string, goa
         Minat Utama / Tema Besar Mingguan (Interest): ${interests}
         Tujuan Pembelajaran Utama (Goal): ${goal}
         Hobi Anak (untuk diintegrasikan dalam kegiatan): ${hobbies}
-        mohon susunlah rencana pembelajaran dengan format detail sebagai berikut:
+        mohon sesuaikan materi dengan umur anak serta susunlah rencana pembelajaran dengan format detail sebagai berikut:
 
         Hari/Tanggal: Hari ke-X (misalnya: Hari ke-1, Hari ke-2, dst. Sesuaikan dengan jumlah hari yang diminta)
         Tema Spesifik Harian: [Sub-tema yang mendukung tema besar mingguan dan relevan dengan hari tersebut]

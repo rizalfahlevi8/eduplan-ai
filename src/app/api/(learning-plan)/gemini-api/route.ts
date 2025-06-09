@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ result: result.text });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    console.log("[GEMINIAPI_POST]",error);
+    return new Response("Internal Error", { status: 500 });
   }
 }

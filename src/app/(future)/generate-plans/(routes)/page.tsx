@@ -15,11 +15,24 @@ const GeneratePlansPage = async () => {
         }
     })
 
+    const learningPlan = await db.learningPlan.findMany({
+        where: {
+          userId: userId,
+        },
+        select: {
+            id: true,
+          goal: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+    });
+
     if (!childProfile) {
         redirect('/')
     }
 
-    return <GeneratePlansClient initialData={childProfile} />
+    return <GeneratePlansClient initialData={childProfile} historyData={learningPlan} />
 }
 
 export default GeneratePlansPage;
