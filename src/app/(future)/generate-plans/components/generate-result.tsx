@@ -1,11 +1,8 @@
-import { LearningPlanPdf } from "@/components/LearningPlanPdf";
+"use client"
+
 import { Button } from "@/components/ui/button";
+import { DownloadPdfButton } from "@/components/ui/button-pdf";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import toast from "react-hot-toast";
 
 export interface GenerateResultProps {
     data: {
@@ -37,35 +34,15 @@ export interface GenerateResultProps {
             }
         }
     }
+    onSubmit?: () => void;
+    loading?: boolean;
 }
 
 export const GenerateResult = (
-    { data }: GenerateResultProps
+    { data, onSubmit, loading }: GenerateResultProps
 ) => {
     const { learningPlan } = data;
     const { plan } = learningPlan;
-
-    const router = useRouter()
-    const [loading, setLoading] = useState(false)
-
-    const onSubmit = async () => {
-        try {
-            setLoading(true)
-            await axios.post(`/api/learning-plan`, {
-                goal: learningPlan.goal,
-                interests: learningPlan.interest,
-                numberOfDays: learningPlan.numberOfDay,
-                planJson: learningPlan.plan
-            })
-            router.refresh()
-            toast.success(`Rencana pembelajaran Anda berhasil disimpan`)
-        } catch (error) {
-            console.error(error)
-            toast.error("Terjadi kesalahan saat menyimpan rencana pembelajaran. Silakan coba lagi.")
-        } finally {
-            setLoading(false)
-        }
-    };
 
     return (
         <div className="space-y-8">
@@ -76,20 +53,12 @@ export const GenerateResult = (
                         <CardDescription>
                             Rencana belajar {learningPlan.numberOfDay} hari yang dipersonalisasi
                         </CardDescription>
-                        <PDFDownloadLink
-                            document={<LearningPlanPdf learningPlan={learningPlan} />}
-                            fileName={`rencana-pembelajaran-${new Date()
-                                .toISOString()
-                                .replace(/[:.]/g, '-')
-                                .slice(0, 16)}.pdf`}
-                        >
-                            {({ loading }) =>
-                                <Button>{loading ? 'Menyiapkan...' : 'Download PDF'}</Button>
-                            }
-                        </PDFDownloadLink>
-                        <Button onClick={onSubmit} disabled={loading}>
-                            {loading ? "Menyimpan..." : "Simpan Rencana"}
-                        </Button>
+                        <DownloadPdfButton learningPlan={learningPlan} />
+                        {onSubmit && (
+                            <Button onClick={onSubmit} disabled={loading}>
+                                {loading ? "Menyimpan..." : "Simpan Rencana"}
+                            </Button>
+                        )}
                     </div>
                     <div className="mt-4">
                         <div className="text-sm font-semibold mb-2">Ketertarikan:</div>

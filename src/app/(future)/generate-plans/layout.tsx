@@ -1,33 +1,12 @@
-
-import db from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-
-export default async function GeneratePlansLayout({
+export default function GeneratePlansLayout({
     children,
-}: {
+  }: {
     children: React.ReactNode;
-}) {
-
-    const { userId } = await auth()
-    if (!userId) {
-        redirect('/sign-in')
-    }
-
-    const childProfile = await db.childProfile.findFirst({
-        where: {
-            userId: userId
-        }
-    })
-
-    if (!childProfile) {
-        redirect('/settings')
-    }
-
+  }) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            {children}
-        </div>
+      <div className="h-[calc(100vh-4.1rem)] overflow-hidden"> {/* 4rem = 64px */}
+        {children}
+      </div>
     );
-
-}
+  }
+  

@@ -1,21 +1,10 @@
-import db from "@/lib/db";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { ChildProfileForm } from "../components/child-profile-form";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { getUserAndChildProfile } from "@/lib/authData";
 
 const SettingPage = async () => {
-    const { userId } = await auth();
-    if (!userId) {
-        redirect('/sign-in');
-    }
-
-    const childProfile = await db.childProfile.findFirst({
-        where: {
-            userId: userId
-        }
-    });
+    const { childProfile } = await getUserAndChildProfile();
 
     return (
         <div className="flex items-start flex-col p-10">
