@@ -1,5 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { getVerify } from "@/lib/auth";
 import React from "react";
 
 export default async function SetupLayout({
@@ -7,14 +6,9 @@ export default async function SetupLayout({
 }:{
     children: React.ReactNode
 }){
-    const { userId } = await auth()
-    if(!userId) {
-        redirect("/sign-in");
-    }
+    await getVerify(); 
 
     return (
-        <>
-        {children}
-        </>
+        <>{children}</>
     )
 }

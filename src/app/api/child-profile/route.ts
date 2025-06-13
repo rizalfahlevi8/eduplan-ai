@@ -2,6 +2,27 @@ import db from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+export async function GET() {
+    try {
+        const { userId } = await auth();
+
+        if (!userId) {
+            return new Response("Unauthorized", { status: 401 });
+        }
+
+        const childProfile = await db.childProfile.findFirst({
+            where: {
+                userId
+            }
+        });
+
+        return NextResponse.json(childProfile);
+    } catch (error) {
+        console.log("[CHILDPROFILE_GET]", error);
+        return new Response("Internal Error", { status: 500 });
+    }
+}
+
 export async function POST(req: Request){
     try {
         const { userId } = await auth();

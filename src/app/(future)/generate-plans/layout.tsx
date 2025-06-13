@@ -1,10 +1,13 @@
-export default function GeneratePlansLayout({
+import { getVerify } from "@/lib/auth";
+
+export default async function GeneratePlansLayout({
     children,
   }: {
     children: React.ReactNode;
   }) {
+    await getVerify(); 
     return (
-      <div className="h-[calc(100vh-4.1rem)] overflow-hidden"> {/* 4rem = 64px */}
+      <div className="h-[calc(100vh-4.1rem)] overflow-hidden"> 
         {children}
       </div>
     );

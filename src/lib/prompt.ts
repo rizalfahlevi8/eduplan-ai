@@ -1,8 +1,8 @@
 export function generatePrompt(age: number, gender: string, hobbies: string, goal: string, interests: string, numberOfDays: string) {
     return `
-        Anda adalah seorang ahli perancang kurikulum pendidikan anak usia dini dengan pendekatan Islami, yang terinspirasi oleh metodologi seperti 'Alkindi Special Curriculum'. Tujuan utama Anda adalah merancang materi pembelajaran yang bertujuan untuk 'menciptakan generasi Muslim yang brilian' ('generates brilliant muslim generation') dan membentuk karakter 'Cerdas & Mulia'.
+        Anda adalah seorang ahli perancang kurikulum pendidikan dengan pendekatan Islami, yang terinspirasi oleh metodologi seperti 'Alkindi Special Curriculum'. Tujuan utama Anda adalah merancang materi pembelajaran yang bertujuan untuk 'menciptakan generasi Muslim yang brilian' ('generates brilliant muslim generation') dan membentuk karakter 'Cerdas & Mulia'.
 
-        Saya membutuhkan Anda untuk membuat sebuah rencana pembelajaran tematik selama ${numberOfDays} hari untuk anak-anak. Mohon sesuaikan konten dengan parameter berikut:
+        Saya membutuhkan Anda untuk membuat sebuah rencana pembelajaran tematik selama ${numberOfDays} hari untuk anak usia ${age} tahun. Mohon sesuaikan konten dengan parameter berikut:
 
         Usia Target: ${age} tahun
         Gender Anak (jika ada preferensi kegiatan tertentu, jika tidak, buatlah netral): ${gender}
@@ -64,4 +64,45 @@ export function generatePrompt(age: number, gender: string, hobbies: string, goa
         }
 
 `
+}
+
+export function cleanAndParseResponse(result: string, numberOfDays: number) {
+    const cleanJsonString = result
+        .replace(/^```json\s*/, '')
+        .replace(/\s*```$/, '')
+        .trim();
+
+    console.log('Cleaned JSON string:', cleanJsonString);
+
+    const parsed = JSON.parse(cleanJsonString);
+
+    if (!parsed.days || !Array.isArray(parsed.days)) {
+        throw new Error("Invalid response structure");
+    }
+
+    while (parsed.days.length < numberOfDays) {
+        const dayNumber = parsed.days.length + 1;
+        parsed.days.push({
+            dayNumber,
+            theme: `Tema Hari ke-${dayNumber}`,
+            activityTitle: "Judul Kegiatan Default",
+            materials: ["Contoh Material 1", "Contoh Material 2"],
+            steps: {
+                pembukaan: ["Buka dengan doa dan basmalah"],
+                pengenalan: ["Kenalkan tema hari ini"],
+                kegiatan: ["Langkah-langkah kegiatan"],
+                diskusi: ["Pertanyaan diskusi sederhana"],
+                penutup: ["Penutup kegiatan dengan doa"]
+            },
+            benefits: {
+                iman: "Manfaat iman default",
+                cognitive: "Manfaat kognitif default",
+                language: "Manfaat bahasa default",
+                motoric: "Manfaat motorik default",
+                akhlak: "Manfaat akhlak default"
+            },
+        });
+    }
+
+    return parsed.days.slice(0, numberOfDays);
 }

@@ -1,15 +1,8 @@
 import { UserButton } from '@clerk/nextjs'
 import React from 'react'
 import { MainNav } from './main-nav'
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 
 const Navbar = async () => {
-  const { userId } = await auth();
-  if (!userId) {
-    redirect('/sign-in');
-  }
-
   return (
     <div className='border-b'>
       <div className='flex h-16 items-center px-4'>

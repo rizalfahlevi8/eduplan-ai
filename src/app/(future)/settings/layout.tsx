@@ -1,3 +1,4 @@
+import { getVerify } from "@/lib/auth";
 import React from "react";
 
 export default async function SettingLayout({
@@ -5,11 +6,8 @@ export default async function SettingLayout({
 }: {
     children: React.ReactNode
 }) {
+    await getVerify(); 
     return (
-        <>
-            <div>
-                {children}
-            </div>
-        </>
-    )
+        <>{children}</> 
+    );
 }

@@ -1,26 +1,116 @@
-import db from "@/lib/db";
-import { GeneratePlansClient } from "../components/client";
-import { getUserAndChildProfile } from "@/lib/authData";
+"use client"
 
-const GeneratePlansPage = async () => {
-    const { userId, childProfile } = await getUserAndChildProfile();
+import { AppSidebar } from "@/components/future/generate-plans/app-sidebar";
+import { GenerateForm } from "@/components/future/generate-plans/generate-form";
+import { GenerateResult } from "@/components/future/generate-plans/generate-result";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { GenerateFormValues } from "@/domain/generateForm-schema";
+import { LearningPlanModel } from "@/domain/learningPlan-model";
+import { ChildProfile } from "@/generated/prisma";
+import { cleanAndParseResponse, generatePrompt } from "@/lib/prompt";
+import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-    const learningPlan = await db.learningPlan.findMany({
-        where: { userId },
-        select: {
-            id: true,
-            goal: true,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+const GeneratePlansPage = () => {
+    const { getToken, isLoaded } = useAuth();
+
+    const [loading, setLoading] = useState(false)
+    const [childProfile, setChildProfile] = useState<ChildProfile | null>(null);
+    const [generatedData, setGeneratedData] = useState<LearningPlanModel | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!isLoaded) return;
+            try {
+                const token = await getToken();
+                if (!token) return;
+
+                const resChildProfile = await axios.get('/api/child-profile', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                setChildProfile(resChildProfile.data);
+
+
+            } catch (err) {
+                console.error("[FETCH_CHILD_PROFILE_ERROR]", err);
+            }
+        };
+
+        fetchData();
+    }, [isLoaded, getToken]);
+
+    const onSubmit = async (data: GenerateFormValues) => {
+
+        if (!childProfile) redirect("/settings");
+
+        try {
+            setLoading(true)
+            const prompt = generatePrompt(childProfile.age, childProfile.gender, childProfile.hobbies, data.goal, data.interest, String(data.numberOfDay));
+            const response = await fetch("/api/gemini-api", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    prompt
+                }),
+            });
+            const dataResponse = await response.json();
+
+            if (!response.ok) {
+                throw new Error(dataResponse.error || "Something went wrong");
+            }
+
+            const parsedPlan = cleanAndParseResponse(dataResponse.result, Number(data.numberOfDay));
+
+            const formattedData: LearningPlanModel = {
+                numberOfDay: data.numberOfDay,
+                goal: data.goal,
+                interest: data.interest,
+                plan: { days: parsedPlan }
+            };
+
+            setGeneratedData(formattedData);
+
+            toast.success("Rencana pembelajaran berhasil dibuat!");
+        } catch (error) {
+            console.error(error)
+            toast.error("Gagal membuat rencana pembelajaran yang valid. Silakan coba lagi.")
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     return (
-        <GeneratePlansClient
-            initialData={childProfile}
-            historyData={learningPlan}
-        />
+        <SidebarProvider className="flex h-full overflow-hidden">
+            <AppSidebar />
+            <div className="relative flex flex-col flex-1 h-[calc(100vh-4.1rem)] overflow-hidden">
+                <SidebarTrigger className="absolute top-4 left-4 z-20" />
+                <SidebarInset className="flex-1 overflow-y-auto">
+                    <div className="container mx-auto py-8">
+                        <div className="max-w-4xl mx-auto space-y-8">
+                            <GenerateForm onSubmit={onSubmit} loading={loading} />
+                        </div>
+
+                        {generatedData && (
+                            <div className="mt-8 max-w-4xl mx-auto space-y-8">
+                                <GenerateResult
+                                    data={generatedData}
+                                    loading={loading}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </SidebarInset>
+            </div>
+        </SidebarProvider>
     );
 };
 

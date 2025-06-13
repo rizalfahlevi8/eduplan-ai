@@ -1,48 +1,16 @@
-"use client"
-
 import { Button } from "@/components/ui/button";
-import { DownloadPdfButton } from "@/components/ui/button-pdf";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { LearningPlanModel } from "@/domain/learningPlan-model"
 
-export interface GenerateResultProps {
-    data: {
-        learningPlan: {
-            numberOfDay: number;
-            goal: string;
-            interest: string;
-            plan: {
-                days: Array<{
-                    dayNumber: number;
-                    theme: string,
-                    activityTitle: string,
-                    materials: string[],
-                    steps: {
-                        pembukaan: [],
-                        pengenalan: [],
-                        kegiatan: [],
-                        diskusi: [],
-                        penutup: []
-                    },
-                    benefits: {
-                        iman: string,
-                        cognitive: string,
-                        language: string,
-                        motoric: string,
-                        akhlak: string
-                    },
-                }>;
-            }
-        }
-    }
-    onSubmit?: () => void;
+interface GenerateResultProps {
+    data: LearningPlanModel;
+    onSave?: () => void;
+    onDelete?: () => void;
     loading?: boolean;
 }
 
-export const GenerateResult = (
-    { data, onSubmit, loading }: GenerateResultProps
-) => {
-    const { learningPlan } = data;
-    const { plan } = learningPlan;
+export const GenerateResult = ({ data, onSave, onDelete, loading }: GenerateResultProps) => {
+    const { plan } = data;
 
     return (
         <div className="space-y-8">
@@ -51,22 +19,26 @@ export const GenerateResult = (
                     <div className="flex justify-between items-start">
                         <CardTitle>Rencana Pembelajaran Anda</CardTitle>
                         <CardDescription>
-                            Rencana belajar {learningPlan.numberOfDay} hari yang dipersonalisasi
+                            Rencana belajar {data.numberOfDay} hari yang dipersonalisasi
                         </CardDescription>
-                        <DownloadPdfButton learningPlan={learningPlan} />
-                        {onSubmit && (
-                            <Button onClick={onSubmit} disabled={loading}>
+                        {onDelete && (
+                            <Button onClick={onDelete} disabled={loading}>
+                                {loading ? "Menhapus..." : "Hapus Rencana"}
+                            </Button>
+                        )}
+                        {onSave && (
+                            <Button onClick={onSave} disabled={loading}>
                                 {loading ? "Menyimpan..." : "Simpan Rencana"}
                             </Button>
                         )}
                     </div>
                     <div className="mt-4">
                         <div className="text-sm font-semibold mb-2">Ketertarikan:</div>
-                        <div className="text-lg">{learningPlan.interest}</div>
+                        <div className="text-lg">{data.interest}</div>
                     </div>
                     <div className="mt-4">
                         <div className="text-sm font-semibold mb-2">Tujuan:</div>
-                        <div className="text-lg">{learningPlan.goal}</div>
+                        <div className="text-lg">{data.goal}</div>
                     </div>
                 </CardHeader>
             </Card>
@@ -77,10 +49,10 @@ export const GenerateResult = (
                 ))}
             </div>
         </div>
-    );
+    )
 }
 
-const DayCard = ({ day }: { day: GenerateResultProps['data']['learningPlan']['plan']['days'][0] }) => (
+const DayCard = ({ day }: { day: GenerateResultProps['data']['plan']['days'][0] }) => (
     <Card className="w-full">
         <CardHeader>
             <CardTitle className="flex justify-between items-center">
