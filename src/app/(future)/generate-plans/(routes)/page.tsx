@@ -8,42 +8,42 @@ import { GenerateFormValues } from "@/domain/generateForm-schema";
 import { LearningPlanModel } from "@/domain/learningPlan-model";
 import { ChildProfile } from "@/generated/prisma";
 import { cleanAndParseResponse, generatePrompt } from "@/lib/prompt";
+import { useLearningPlans } from "@/providers/learningPlan-provider";
 import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const GeneratePlansPage = () => {
     const { getToken, isLoaded } = useAuth();
+    const { refetch: refetchLearningPlans } = useLearningPlans();
 
     const [loading, setLoading] = useState(false)
     const [childProfile, setChildProfile] = useState<ChildProfile | null>(null);
     const [generatedData, setGeneratedData] = useState<LearningPlanModel | null>(null);
 
+    const  fetchChildProfile = useCallback(async () => {
+        if (!isLoaded) return;
+        try {
+            const token = await getToken();
+            if (!token) return;
+    
+            const resChildProfile = await axios.get('/api/child-profile', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setChildProfile(resChildProfile.data);
+        } catch (err) {
+            console.error("[FETCH_CHILD_PROFILE_ERROR]", err);
+        }
+    }, [getToken, isLoaded]);
+    
     useEffect(() => {
-        const fetchData = async () => {
-            if (!isLoaded) return;
-            try {
-                const token = await getToken();
-                if (!token) return;
-
-                const resChildProfile = await axios.get('/api/child-profile', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                setChildProfile(resChildProfile.data);
-
-
-            } catch (err) {
-                console.error("[FETCH_CHILD_PROFILE_ERROR]", err);
-            }
-        };
-
-        fetchData();
-    }, [isLoaded, getToken]);
+         fetchChildProfile();
+    }, [ fetchChildProfile]);
 
     const onSubmit = async (data: GenerateFormValues) => {
 
@@ -87,10 +87,30 @@ const GeneratePlansPage = () => {
         }
     }
 
+    const onSave = async () => {
+        if (!generatedData) return;
+
+        try {
+            setLoading(true)
+            await axios.post(`/api/learning-plan`, {
+                goal: generatedData.goal,
+                interests: generatedData.interest, 
+                numberOfDays: generatedData.numberOfDay, 
+                planJson: generatedData.plan, 
+              });              
+              await refetchLearningPlans();
+            toast.success(`Rencana pembelajaran Anda berhasil disimpan`)
+        } catch (error) {
+            console.error(error)
+            toast.error("Terjadi kesalahan saat menyimpan rencana pembelajaran. Silakan coba lagi.")
+        } finally {
+            setLoading(false)
+        }
+    };
 
     return (
         <SidebarProvider className="flex h-full overflow-hidden">
-            <AppSidebar />
+            <AppSidebar/>
             <div className="relative flex flex-col flex-1 h-[calc(100vh-4.1rem)] overflow-hidden">
                 <SidebarTrigger className="absolute top-4 left-4 z-20" />
                 <SidebarInset className="flex-1 overflow-y-auto">
@@ -104,6 +124,7 @@ const GeneratePlansPage = () => {
                                 <GenerateResult
                                     data={generatedData}
                                     loading={loading}
+                                    onSave={onSave}
                                 />
                             </div>
                         )}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ToasterProvider } from "../../providers/toast-provider";
+import { ToasterProvider } from "@/providers/toast-provider";
 import Navbar from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,9 +24,9 @@ export default function RootLayout({
           <ToasterProvider />
           <Navbar />
           <div className="relative">
-          {children}
+            {children}
           </div>
-          </body>
+        </body>
       </html>
     </ClerkProvider>
   );

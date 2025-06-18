@@ -9,39 +9,15 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem
 } from "@/components/ui/sidebar";
-import { LearningPlan } from "@/generated/prisma";
-import { useAuth } from "@clerk/nextjs";
-import axios from "axios";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useLearningPlans } from "../../../providers/learningPlan-provider";
+import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 
 export const AppSidebar = () => {
-  const { getToken, isLoaded } = useAuth();
-  const [learningPlans, setLearningPlans] = useState<LearningPlan[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!isLoaded) return;
-      try {
-        const token = await getToken();
-        if (!token) return;
-        const resLearningPlan = await axios.get('/api/learning-plan', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setLearningPlans(resLearningPlan.data);
-
-
-      } catch (err) {
-        console.error("[FETCH_CHILD_PROFILE_ERROR]", err);
-      }
-    };
-
-    fetchData();
-  }, [isLoaded, getToken]);
-
+  const { learningPlans } = useLearningPlans();
+  const pathname = usePathname(); // ⬅️ Dapatkan path saat ini
 
   return (
     <Sidebar className="relative border-r border-gray-200" collapsible="icon">
@@ -55,28 +31,51 @@ export const AppSidebar = () => {
                 </a>
               </SidebarMenuButton>
 
-
               <SidebarMenuSub className="mt-2 space-y-1">
-                {/* New Generate with Border */}
+                {/* Tombol New Generate */}
                 <SidebarMenuSubItem>
-                  <SidebarMenuSubButton asChild className="border border-dashed border-primary rounded-md px-2 py-1 hover:bg-primary/10">
-                    <Link href={`/generate-plans`}>
+                  <SidebarMenuSubButton
+                    asChild
+                    className={`border border-dashed rounded-md px-2 py-1 hover:bg-primary/10 ${
+                      pathname === "/generate-plans" ? "border-primary bg-primary/10" : "border-gray-300"
+                    }`}
+                  >
+                    <Link href="/generate-plans">
                       <PlusCircle className="mr-2 h-5 w-5 text-primary" />
                       <span className="text-primary font-semibold">New generate</span>
                     </Link>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
-                {learningPlans.length > 0 && learningPlans.map((item) => (
-                  <SidebarMenuSubItem key={item.id}>
-                    <SidebarMenuSubButton asChild className="hover:bg-muted rounded-md px-2 py-1">
-                      <Link href={`/generate-plans/${item.id}`}>
-                        <span>{item.goal}</span>
-                      </Link>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                ))}
-              </SidebarMenuSub>
 
+                {/* Daftar Rencana */}
+                {learningPlans.length > 0 &&
+                  learningPlans.map((item) => {
+                    const isActive = pathname === `/generate-plans/${item.id}`;
+                    return (
+                      <SidebarMenuSubItem key={item.id} className="relative group/item px-1">
+                        <div
+                          className={`flex items-center justify-between w-full rounded-md pr-5 ${
+                            isActive ? "bg-muted font-semibold text-primary" : "hover:bg-muted"
+                          }`}
+                        >
+                          <SidebarMenuSubButton asChild className="flex-1 text-left">
+                            <Link href={`/generate-plans/${item.id}`}>
+                              <span className="line-clamp-1">{item.goal}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="text-muted-foreground" />
+                          </Button>
+                        </div>
+                      </SidebarMenuSubItem>
+                    );
+                  })}
+              </SidebarMenuSub>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>

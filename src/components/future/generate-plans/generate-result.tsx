@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { DownloadPdfButton } from "@/components/ui/button-pdf";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LearningPlanModel } from "@/domain/learningPlan-model"
 
@@ -21,6 +22,7 @@ export const GenerateResult = ({ data, onSave, onDelete, loading }: GenerateResu
                         <CardDescription>
                             Rencana belajar {data.numberOfDay} hari yang dipersonalisasi
                         </CardDescription>
+                        <DownloadPdfButton learningPlan={data} />
                         {onDelete && (
                             <Button onClick={onDelete} disabled={loading}>
                                 {loading ? "Menhapus..." : "Hapus Rencana"}
