@@ -2,19 +2,24 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type MainNavProps = React.HTMLAttributes<HTMLElement>;
 
 export function MainNav({ className }: MainNavProps) {
   const pathname = usePathname();
-  const params = useParams();
 
   const routes = [
     {
-      href: `/${params.storeId}`,
+      href: "/dashboard",
       label: "Dashboard",
-      active: pathname === `/${params.storeId}`,
+      active: pathname === "/dashboard",
+      position: "left",
+    },
+    {
+      href: "/generate-plans",
+      label: "Generate Plans",
+      active: pathname === "/generate-plans" || pathname.startsWith(`/generate-plans/`),
       position: "left",
     },
     {
@@ -22,12 +27,6 @@ export function MainNav({ className }: MainNavProps) {
       label: "Settings",
       active: pathname === "/settings",
       position: "right",
-    },
-    {
-      href: "/generate-plans",
-      label: "Generate Plans",
-      active: pathname === "/generate-plans" || pathname.startsWith(`/generate-plans/`),
-      position: "left",
     },
   ];
 
