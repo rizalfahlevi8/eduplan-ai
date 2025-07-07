@@ -100,6 +100,7 @@ export function DashboardContent() {
           <TodayStudyCard 
             recommendation={todayRecommendation}
             loading={loading}
+            onProgressUpdate={getTodayRecommendation}
           />
           
           <ProgressOverview 

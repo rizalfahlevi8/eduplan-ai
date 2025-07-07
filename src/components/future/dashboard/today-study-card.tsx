@@ -7,6 +7,10 @@ import { Calendar, Clock, Target, BookOpen, Play, CheckCircle } from "lucide-rea
 import { DayPlanModel, LearningPlanModel } from "@/domain/learningPlan-model";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface TodayRecommendation {
   plan: LearningPlanModel;
@@ -18,9 +22,41 @@ interface TodayRecommendation {
 interface TodayStudyCardProps {
   recommendation: TodayRecommendation | null;
   loading: boolean;
+  onProgressUpdate?: () => void;
 }
 
-export function TodayStudyCard({ recommendation, loading }: TodayStudyCardProps) {
+export function TodayStudyCard({ recommendation, loading, onProgressUpdate }: TodayStudyCardProps) {
+  const { getToken } = useAuth();
+  const [updating, setUpdating] = useState(false);
+
+  const handleMarkComplete = async () => {
+    if (!recommendation) return;
+    
+    setUpdating(true);
+    try {
+      const token = await getToken();
+      if (!token) return;
+
+      await axios.post('/api/dashboard/progress', {
+        learningPlanId: 'mock-plan-id', // In real app, this would come from the recommendation
+        dayNumber: recommendation.dayNumber,
+        completed: !recommendation.isCompleted
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      toast.success(recommendation.isCompleted ? "Marked as incomplete" : "Study session completed! 🎉");
+      onProgressUpdate?.();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update progress");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -149,15 +185,24 @@ export function TodayStudyCard({ recommendation, loading }: TodayStudyCardProps)
                 <Play className="size-4 mr-2" />
                 Start Today&apos;s Study
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline" 
+                onClick={handleMarkComplete}
+                disabled={updating}
+              >
                 <CheckCircle className="size-4 mr-2" />
-                Mark Complete
+                {updating ? "Updating..." : "Mark Complete"}
               </Button>
             </>
           ) : (
-            <Button variant="outline" className="flex-1">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={handleMarkComplete}
+              disabled={updating}
+            >
               <CheckCircle className="size-4 mr-2" />
-              Completed Today
+              {updating ? "Updating..." : "Completed Today"}
             </Button>
           )}
         </div>
