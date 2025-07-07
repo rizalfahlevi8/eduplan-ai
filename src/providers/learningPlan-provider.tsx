@@ -1,6 +1,6 @@
 "use client";
 
-import { LearningPlan } from "@/generated/prisma";
+import { LearningPlan } from "@/domain/database-models";
 import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";

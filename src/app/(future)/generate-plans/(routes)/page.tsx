@@ -6,7 +6,7 @@ import { GenerateResult } from "@/components/future/generate-plans/generate-resu
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { GenerateFormValues } from "@/domain/generateForm-schema";
 import { LearningPlanModel } from "@/domain/learningPlan-model";
-import { ChildProfile } from "@/generated/prisma";
+import { ChildProfile } from "@/domain/database-models";
 import { cleanAndParseResponse, generatePrompt } from "@/lib/prompt";
 import { useLearningPlans } from "@/providers/learningPlan-provider";
 import { useAuth } from "@clerk/nextjs";

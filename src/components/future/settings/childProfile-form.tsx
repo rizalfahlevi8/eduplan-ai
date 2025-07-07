@@ -1,5 +1,5 @@
 import { ChildProfileFormValues, childProfileSchema } from "@/domain/childProfile-schema";
-import { ChildProfile } from "@/generated/prisma";
+import { ChildProfile } from "@/domain/database-models";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

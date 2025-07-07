@@ -4,7 +4,7 @@ import { ChildProfileForm } from "@/components/future/settings/childProfile-form
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { ChildProfileFormValues } from "@/domain/childProfile-schema";
-import { ChildProfile } from "@/generated/prisma";
+import { ChildProfile } from "@/domain/database-models";
 import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import { useEffect, useState } from "react";
