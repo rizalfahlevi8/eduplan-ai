@@ -1,4 +1,5 @@
-import { getVerify } from "@/lib/auth";
+// app/settings/layout.tsx
+import { getVerifyAuth } from "@/lib/auth"; // ← gunakan fungsi baru
 import React from "react";
 
 export default async function SettingLayout({
@@ -6,7 +7,7 @@ export default async function SettingLayout({
 }: {
     children: React.ReactNode
 }) {
-    await getVerify(); 
+    await getVerifyAuth(); // ← hanya cek login, TIDAK cek childProfile
     return (
         <>{children}</> 
     );

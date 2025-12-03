@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const { prompt } = await req.json();
 
     const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-04-17',
+      model: 'gemini-2.5-flash',
       contents: prompt,
     });
 
