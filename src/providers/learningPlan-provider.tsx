@@ -3,7 +3,7 @@
 import { LearningPlan } from "@/generated/prisma";
 import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 
 interface LearningPlanContextType {
@@ -18,7 +18,7 @@ export function LearningPlanProvider({ children }: { children: React.ReactNode }
     const { getToken, isLoaded } = useAuth();
     const [learningPlans, setLearningPlans] = useState<LearningPlan[]>([]);
 
-    const fetchLearningPlans = async () => {
+    const fetchLearningPlans = useCallback(async () => {
         if (!isLoaded) return;
         try {
             const token = await getToken();
@@ -34,7 +34,7 @@ export function LearningPlanProvider({ children }: { children: React.ReactNode }
         } catch (err) {
             console.error("[FETCH_LEARNING_PLANS_ERROR]", err);
         }
-    };
+    }, [getToken, isLoaded]);
 
     const deletePlan = async (id: string) => {
         if (!isLoaded) return;
@@ -58,7 +58,7 @@ export function LearningPlanProvider({ children }: { children: React.ReactNode }
 
     useEffect(() => {
         fetchLearningPlans();
-    }, [isLoaded]);
+    }, [isLoaded, fetchLearningPlans]);
 
     return (
         <LearningPlanContext.Provider value={{ learningPlans, refetch: fetchLearningPlans, deletePlan }}>

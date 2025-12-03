@@ -38,4 +38,26 @@ model LearningPlan {
   planJson     Json
   createdAt    DateTime  @default(now())
   updatedAt    DateTime? @updatedAt
+  
+  // Relation to progress tracking
+  progress     UserProgress[]
+}
+
+model UserProgress {
+  id              String        @id @default(cuid())
+  userId          String
+  learningPlanId  String
+  dayNumber       Int
+  completed       Boolean       @default(false)
+  completedAt     DateTime?
+  studyDuration   Int?          // in minutes
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt
+  
+  // Relations
+  learningPlan    LearningPlan  @relation(fields: [learningPlanId], references: [id], onDelete: Cascade)
+  
+  // Unique constraint to prevent duplicate progress entries
+  @@unique([userId, learningPlanId, dayNumber])
 }
